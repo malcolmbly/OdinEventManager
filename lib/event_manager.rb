@@ -27,8 +27,7 @@ def load_erb_template
   ERB.new template_letter
 end
 
-def save_file(id)
-  form_letter = load_erb_template.result(binding)
+def save_file(id, form_letter)
   Dir.mkdir('output') unless Dir.exist?('output')
   filename = "output/thanks_#{id}.html"
 
@@ -52,7 +51,8 @@ def read_csv(file_name)
     zipcode = clean_zipcode(contents[:zipcode])
     first_name = contents[:first_name]
     representatives = query_civic_api(contents[:zipcode])
-    save_file(id)
+    form_letter = load_erb_template.result(binding)
+    save_file(id, form_letter)
   end
 end
 
