@@ -7,6 +7,18 @@ def clean_zipcode(zipcode)
   zipcode.to_s.rjust(5, '0')[0..4]
 end
 
+def clean_phone_number(phone_number)
+  phone_number.gsub!(/[^0-9]/, '')
+  length = phone_number.length
+  if length > 11 || length < 10
+    ''
+  elsif length == 11 && phone_number[0] != 1
+    ''
+  else
+    phone_number[-10, length]
+  end
+end
+
 private
 
 def query_civic_api(zipcode)
@@ -53,6 +65,8 @@ def read_csv(file_name)
     representatives = query_civic_api(contents[:zipcode])
     form_letter = load_erb_template.result(binding)
     save_file(id, form_letter)
+    # phone_number = clean_phone_number(contents[:homephone])
+    # p phone_number
   end
 end
 
