@@ -1,6 +1,7 @@
 require 'csv'
 require 'google/apis/civicinfo_v2'
 require 'erb'
+require 'time'
 puts 'Event Manager Initialized!'
 
 def clean_zipcode(zipcode)
@@ -19,7 +20,17 @@ def clean_phone_number(phone_number)
   end
 end
 
-private
+def find_peak_hours(reader)
+  reg_dates = Array.new(24, 0)
+  until reader.eof?
+    contents = reader.readline
+    time = Time.strptime(contents[:regdate], '%m/%d/%Y %H:%M')
+    hour = time.hour
+    reg_dates[hour] += 1
+  end
+  p reg_dates
+  reg_dates.each_with_index.max[1]
+end
 
 def query_civic_api(zipcode)
   api_key = 'AIzaSyDz8QHB90XF6lme-XZYHmmUaGL_IQ57Ttk'
@@ -48,15 +59,7 @@ def save_file(id, form_letter)
   end
 end
 
-def read_csv(file_name)
-  if File.exist?(file_name)
-    reader = CSV.open(
-      file_name,
-      headers: true,
-      header_converters: :symbol
-    )
-  end
-
+def read_csv(reader)
   until reader.eof?
     contents = reader.readline
     id = contents[0]
@@ -71,4 +74,12 @@ def read_csv(file_name)
 end
 
 file_name = 'event_attendees.csv'
-read_csv(file_name)
+if File.exist?(file_name)
+  reader = CSV.open(
+    file_name,
+    headers: true,
+    header_converters: :symbol
+  )
+end
+# read_csv(reader)
+p find_peak_hours(reader)
