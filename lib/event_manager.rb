@@ -2,6 +2,7 @@ require 'csv'
 require 'google/apis/civicinfo_v2'
 require 'erb'
 require 'time'
+require 'date'
 puts 'Event Manager Initialized!'
 
 def clean_zipcode(zipcode)
@@ -27,6 +28,18 @@ def find_peak_hours(reader)
     time = Time.strptime(contents[:regdate], '%m/%d/%Y %H:%M')
     hour = time.hour
     reg_dates[hour] += 1
+  end
+  p reg_dates
+  reg_dates.each_with_index.max[1]
+end
+
+def find_peak_day_of_week(reader)
+  reg_dates = Array.new(7, 0)
+  until reader.eof?
+    contents = reader.readline
+    date = Date.strptime(contents[:regdate], '%m/%d/%Y %H:%M')
+    day = date.wday
+    reg_dates[day] += 1
   end
   p reg_dates
   reg_dates.each_with_index.max[1]
@@ -82,4 +95,5 @@ if File.exist?(file_name)
   )
 end
 # read_csv(reader)
-p find_peak_hours(reader)
+# p find_peak_hours(reader)
+p find_peak_day_of_week(reader)
